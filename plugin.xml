@@ -3,7 +3,7 @@
             id="com.genuitec.mobione.phoneui" version="0.2.3">
         <name>Mobione</name>
         <description>Mobione Phoneui Framework</description>
-        <license>Genuitec</license>
+        <license>Apache 2.0</license>
         <author>Genuitec LLC</author>
         
         <keywords>mobione,phoneui</keywords>
