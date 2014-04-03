@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+            id="com.genuitec.mobione.phoneui" version="0.2.3">
+        <name>Mobione</name>
+        <description>Mobione Phoneui Framework</description>
+        <license>Genuitec</license>
+        <author>Genuitec LLC</author>
+        
+        <keywords>mobione,phoneui</keywords>
+        
+        <js-module src="www/mobione.js" name="mobione">
+        </js-module>
+        
+        <platform name="ios">
+            <config-file target="config.xml" parent="/*">
+                <feature name="MobiOne">
+                    <param name="ios-package" value="MobiOnePlugin" />
+                </feature>
+            </config-file>
+
+            <header-file src="src/ios/MobiOnePlugin.h" />
+            <source-file src="src/ios/MobiOnePlugin.m" />
+            
+            <framework src="MediaPlayer.framework" weak="true" />
+        </platform>
+</plugin>
