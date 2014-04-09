@@ -11,6 +11,10 @@
         <js-module src="www/mobione.js" name="mobione">
         </js-module>
         
+        <engines>
+            <engine name="cordova" version=">=3.0.0" />
+        </engines>
+        
         <platform name="ios">
             <config-file target="config.xml" parent="/*">
                 <feature name="MobiOne">
