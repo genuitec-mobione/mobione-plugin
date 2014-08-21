@@ -23,7 +23,7 @@ supported platforms
 ==============
 
 iOS
-
+Android
 
 license
 ==============
