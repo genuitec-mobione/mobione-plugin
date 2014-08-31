@@ -3,9 +3,10 @@
  */
 package com.genuitec.mobione.android;
 
+
+
 import java.io.IOException;
 
-import com.genuitec.mobione.build.template.android.R;
 
 import android.app.Activity;
 import android.content.res.AssetFileDescriptor;
@@ -43,9 +44,13 @@ public class PlayVideoActivity extends Activity implements SurfaceHolder.Callbac
 	private int videoHeight;
 	private boolean videoSizeKnown = false;
 	private boolean videoReadyToBePlayed = false;
-
-	// private TextView text = null;
-
+	
+	private int layoutResource;
+	
+	int getResource(String type, String name) {
+		return getResources().getIdentifier(name, type, getApplicationContext().getPackageName());
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -54,10 +59,12 @@ public class PlayVideoActivity extends Activity implements SurfaceHolder.Callbac
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		this.layoutResource = getResource("layout", "play_video");
+	
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		setContentView(R.layout.play_video);
-		surface = (SurfaceView) findViewById(R.id.surface);
+		setContentView(layoutResource);
+		surface = (SurfaceView) findViewById(getResource("id", "surface"));
 		holder = surface.getHolder();
 		holder.addCallback(this);
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -77,7 +84,7 @@ public class PlayVideoActivity extends Activity implements SurfaceHolder.Callbac
 		handler.post(new Runnable() {
 			public void run() {
 				if (videoReadyToBePlayed && videoSizeKnown) {
-					View layout = findViewById(R.id.layout);
+					View layout = findViewById(getResource("id", "layout"));
 					int layoutWidth = layout.getWidth();
 					int layoutHeight = layout.getHeight();
 					if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT && layoutWidth > layoutHeight
@@ -208,7 +215,7 @@ public class PlayVideoActivity extends Activity implements SurfaceHolder.Callbac
 	@Override
 	public void onPrepared(MediaPlayer mp) {
 		mediaController.setMediaPlayer(this);
-		mediaController.setAnchorView(findViewById(R.id.layout));
+		mediaController.setAnchorView(findViewById(getResource("id", "layout")));
 		handler.post(new Runnable() {
 			public void run() {
 				mediaController.setEnabled(true);
@@ -353,7 +360,7 @@ public class PlayVideoActivity extends Activity implements SurfaceHolder.Callbac
 	 * Starts the video play-back.
 	 */
 	private void startVideoPlayback() {
-		View layout = findViewById(R.id.layout);
+		View layout = findViewById(getResource("id", "layout"));
 		resizeHolder(layout.getWidth(), layout.getHeight());
 		mediaPlayer.start();
 	}
@@ -371,6 +378,12 @@ public class PlayVideoActivity extends Activity implements SurfaceHolder.Callbac
 		// text.setText("(" + videoWidth + " x " + videoHeight + ") :: (" + layoutWidth + " x " + layoutHeight +
 		// ") => (" + holderWidth + " x " + holderHeight + ")");
 		holder.setFixedSize(holderWidth, holderHeight);
+	}
+
+	@Override
+	public int getAudioSessionId() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

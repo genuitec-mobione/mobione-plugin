@@ -41,33 +41,12 @@
                     <param name="android-package" value="com.genuitec.mobione.android.MobiOnePlugin"/>
                     <param name="onload" value="true" />
                 </feature>
-                
-                <feature name="Viewer" >
-                    <param name="android-package" value="com.phonegap.plugins.file.Viewer"/>
-                    <param name="onload" value="true" />
-                </feature>
-                
-                <feature name="Downloader" >
-                    <param name="android-package" value="com.phonegap.plugins.downloader.Downloader"/>
-                    <param name="onload" value="true" />
-                </feature>
+
             </config-file>
 
             <config-file target="AndroidManifest.xml" parent="/manifest/application">
 
                 <!-- <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8" /> -->
-
-                <activity
-                    android:name="com.genuitec.mobione.build.template.android.Main"
-                    android:configChanges="orientation|keyboardHidden"
-                    android:label="AndroidTemplate"
-                    android:screenOrientation="unspecified" >
-                    <intent-filter>
-                        <action android:name="android.intent.action.MAIN" />
-
-                        <category android:name="android.intent.category.LAUNCHER" />
-                    </intent-filter>
-                </activity>
                 <activity
                     android:name="com.genuitec.mobione.android.PlayVideoActivity"
                     android:configChanges="orientation|keyboardHidden"
@@ -77,17 +56,6 @@
                     <intent-filter>
                     </intent-filter>
                 </activity>
-                
-                <activity 
-                    android:name="com.phonegap.plugins.pdf.ProxyActivity"
-                    android:configChanges="orientation|keyboardHidden"
-                    android:label="AndroidTemplate"
-                    android:screenOrientation="unspecified" >
-                   <intent-filter>
-                    </intent-filter>             
-                </activity>
-
-
             </config-file>
 
 
@@ -97,18 +65,7 @@
 
             <source-file src="src/android/com/genuitec/mobione/android/PlayVideoActivity.java" 
                   target-dir="src/com/genuitec/mobione/android/" />
-
-            <source-file src="src/android/com/genuitec/mobione/build/template/android/Main.java" 
-                  target-dir="src/com/genuitec/mobione/build/template/android/" />
-
-            <source-file src="src/android/com/phonegap/plugins/downloader/Downloader.java" 
-                  target-dir="src/com/phonegap/plugins/downloader/" />
-
-            <source-file src="src/android/com/phonegap/plugins/file/Viewer.java" 
-                  target-dir="src/com/phonegap/plugins/file/" />
-
-            
-            
+                        
         </platform>
         
 
