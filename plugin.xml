@@ -43,6 +43,16 @@
                     <param name="onload" value="true" />
                 </feature>
 
+                <feature name="Viewer" >
+                    <param name="android-package" value="com.phonegap.plugins.file.Viewer"/>
+                    <param name="onload" value="true" />
+                </feature>
+                
+                <feature name="Downloader" >
+                    <param name="android-package" value="com.phonegap.plugins.downloader.Downloader"/>
+                    <param name="onload" value="true" />
+                </feature>                
+
             </config-file>
 
             <config-file target="AndroidManifest.xml" parent="/manifest/application">
@@ -57,6 +67,7 @@
                     <intent-filter>
                     </intent-filter>
                 </activity>
+
             </config-file>
 
 
@@ -66,7 +77,12 @@
 
             <source-file src="src/android/com/genuitec/mobione/android/PlayVideoActivity.java" 
                   target-dir="src/com/genuitec/mobione/android/" />
-                        
+
+            <source-file src="src/android/com/phonegap/plugins/downloader/Downloader.java" 
+                  target-dir="src/com/phonegap/plugins/downloader/" />
+
+            <source-file src="src/android/com/phonegap/plugins/file/Viewer.java" 
+                  target-dir="src/com/phonegap/plugins/file/" />                        
         </platform>
         
 
