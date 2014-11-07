@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
-            id="com.genuitec.mobione.phoneui" version="0.2.5">
+            id="com.genuitec.mobione.phoneui" version="0.2.6">
         <name>Mobione</name>
         <description>Mobione Phoneui Framework</description>
         <license>Apache 2.0</license>
