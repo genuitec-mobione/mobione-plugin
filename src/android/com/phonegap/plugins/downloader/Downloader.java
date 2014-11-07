@@ -10,7 +10,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
@@ -32,8 +31,7 @@ public class Downloader extends CordovaPlugin {
 			return false;
 		}
 		
-		try {
-			
+		try {	
 			final String fileUrl = args.getString(0);
 			JSONObject params = args.getJSONObject(1);
 			
@@ -45,26 +43,33 @@ public class Downloader extends CordovaPlugin {
 					
 			final Boolean overwrite = params.has("overwrite") ? params.getBoolean("overwrite") : false;
 			
-			
 			cordova.getThreadPool().execute(new Runnable() {
-
 				@Override
 				public void run() {
 					try {
 						PluginResult res = downloadUrl(fileUrl, dirName, fileName, overwrite, callbackContext);
-						callbackContext.sendPluginResult(res);						
+						sendPluginResult(callbackContext, res);
 					} catch (Exception e) {
 						e.printStackTrace();
-						callbackContext.error(e.getMessage());			
+						callbackContext.error("Exception in worker: " + e.getMessage());			
 					}
 				}
 			});
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			callbackContext.error(e.getMessage());			
+			callbackContext.error("Exception in plugin: " + e.getMessage());			
 		}
 		return true;		
+	}
+	
+	private void sendPluginResult(final CallbackContext callbackContext, final PluginResult res) {
+		cordova.getActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				callbackContext.sendPluginResult(res);
+			}
+		});
 	}
 	
 	private File getTempDir() {
@@ -179,7 +184,7 @@ public class Downloader extends CordovaPlugin {
 		
 		PluginResult res = new PluginResult(PluginResult.Status.OK, obj);
 		res.setKeepCallback(true);
-		callbackContext.sendPluginResult(res);
+		sendPluginResult(callbackContext, res);
 		
 		//Give a chance for the progress to be sent to javascript
 		Thread.sleep(100);

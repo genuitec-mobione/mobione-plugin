@@ -48,11 +48,16 @@ public class Viewer extends CordovaPlugin {
 		
 		void reportSuccess() {
 			i("reportSuccess!");
-			JSONObject res = new JSONObject();
+			final JSONObject res = new JSONObject();
 			try {
 				res.put("file", uri);
 			} catch (JSONException e) { /* dummy */ }
-			callbackContext.success(res);
+			cordova.getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					callbackContext.success(res);					
+				}
+			});
 		}
 		
 		void cleanup() {
@@ -71,6 +76,15 @@ public class Viewer extends CordovaPlugin {
 	private static void i(String s) {
 		Log.i(TAG, s);
 	}
+	
+	private void sendPluginResult(final CallbackContext callbackContext, final PluginResult res) {
+		cordova.getActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				callbackContext.sendPluginResult(res);
+			}
+		});
+	}	
 
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 		
