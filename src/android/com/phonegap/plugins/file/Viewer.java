@@ -14,8 +14,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import org.apache.cordova.api.Plugin;
-import org.apache.cordova.api.PluginResult;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,15 +33,16 @@ import android.os.Environment;
 import android.util.Log;
 import android.util.SparseArray;
 
-public class Viewer extends Plugin {
+public class Viewer extends CordovaPlugin {
 
 	private class CallbackData {
 		private final String uri;
-		private final String callbackId;
+		private final CallbackContext callbackContext;
 		private final Runnable cleanup;
-		public CallbackData(String uri, String callbackId, Runnable cleanup) throws IOException {
+		
+		public CallbackData(String uri, CallbackContext callbackContext, Runnable cleanup) throws IOException {
 			this.uri = uri;
-			this.callbackId = callbackId;
+			this.callbackContext = callbackContext;
 			this.cleanup = cleanup;
 		}
 		
@@ -50,7 +52,7 @@ public class Viewer extends Plugin {
 			try {
 				res.put("file", uri);
 			} catch (JSONException e) { /* dummy */ }
-			Viewer.this.success(res, callbackId);
+			callbackContext.success(res);
 		}
 		
 		void cleanup() {
@@ -70,21 +72,10 @@ public class Viewer extends Plugin {
 		Log.i(TAG, s);
 	}
 
-	/**
-	 * Executes the request and returns PluginResult.
-	 * 
-	 * @param action
-	 *            The action to execute.
-	 * @param args
-	 *            JSONArry of arguments for the plugin.
-	 * @param callbackId
-	 *            The callback id used when calling back into JavaScript.
-	 * @return A PluginResult object with a status and message.
-	 */
-	public PluginResult execute(String action, JSONArray args, String callbackId) {
+	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 		
 		if (!action.equals("showFile")) {
-			return new PluginResult(PluginResult.Status.INVALID_ACTION);
+			return false;
 		}
 		
 		try {			
@@ -97,16 +88,16 @@ public class Viewer extends Plugin {
 			
 			String mimeType = args.getString(1);
 			
-			this.showFile(uri, mimeType, callbackId);
+			this.showFile(uri, mimeType, callbackContext);
 
-			PluginResult pluginResult = new PluginResult(PluginResult.Status.NO_RESULT);
-			pluginResult.setKeepCallback(true);
-			return pluginResult;		
-		} catch (JSONException e) {
-			return new PluginResult(PluginResult.Status.JSON_EXCEPTION);
+			//PluginResult pluginResult = new PluginResult(PluginResult.Status.NO_RESULT);
+			//pluginResult.setKeepCallback(true);
+			//return pluginResult;		
 		} catch (Throwable e) {
-			return new PluginResult(PluginResult.Status.ERROR, e.getMessage());
+			e.printStackTrace();
+			callbackContext.error(e.getMessage());
 		}
+		return true;
 	}
 	
 	@Override
@@ -146,7 +137,7 @@ public class Viewer extends Plugin {
 	}
 	
 	@SuppressLint({ "WorldReadableFiles", "WorldWriteableFiles" })
-	private void showFile(Uri uri, String mimeType, String callbackId) throws Throwable {
+	private void showFile(Uri uri, String mimeType, CallbackContext callbackContext) throws Throwable {
 		i("showFile: " + uri.toString() + ", mime: " + mimeType);
 		
 		final String assetPrefix = "/android_asset/";
@@ -201,7 +192,7 @@ public class Viewer extends Plugin {
 				if (is != null) is.close();
 			}
 			final File toDelete = tempFile;
-			cd = new CallbackData(uri.toString(), callbackId, new Runnable() {
+			cd = new CallbackData(uri.toString(), callbackContext, new Runnable() {
 				@Override
 				public void run() {
 					i("DELETING " + toDelete);
@@ -211,7 +202,7 @@ public class Viewer extends Plugin {
 		} else {
 			i("Opening uri: " + uri);
 			realUri = uri;
-			cd = new CallbackData(uri.toString(), callbackId, null);		
+			cd = new CallbackData(uri.toString(), callbackContext, null);		
 		}
 		
 		int request = addCd(cd);

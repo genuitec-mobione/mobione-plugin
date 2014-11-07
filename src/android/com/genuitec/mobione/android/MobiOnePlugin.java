@@ -66,6 +66,13 @@ public class MobiOnePlugin extends CordovaPlugin {
 	@Override
 	public boolean execute(String action, JSONArray args,
 			CallbackContext callbackContext) throws JSONException {
-		return super.execute(action, args, callbackContext);
+		action = action == null ? "" : action.toLowerCase();
+		Action actionObj = actions.get(action);
+		if (actionObj != null) {
+			actionObj.execute(args, callbackContext);
+			callbackContext.success();
+			return true;
+		}
+		return false;
 	}
 }

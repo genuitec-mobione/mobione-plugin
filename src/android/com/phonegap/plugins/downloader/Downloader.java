@@ -7,7 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,42 +24,47 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 
-import org.apache.cordova.api.Plugin;
-import org.apache.cordova.api.PluginResult;
 
-public class Downloader extends Plugin {
+public class Downloader extends CordovaPlugin {
 
-	@Override
-	public PluginResult execute(String action, JSONArray args, String callbackId) {
-		
-		if (!action.equals("downloadFile")) 
-			return new PluginResult(PluginResult.Status.INVALID_ACTION);
+	public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
+		if (!action.equals("downloadFile")) {
+			return false;
+		}
 		
 		try {
 			
-			String fileUrl = args.getString(0);
+			final String fileUrl = args.getString(0);
 			JSONObject params = args.getJSONObject(1);
 			
-			String fileName = params.has("fileName") ? 
+			final String fileName = URLEncoder.encode(params.has("fileName") ? 
 					params.getString("fileName"):
-					fileUrl.substring(fileUrl.lastIndexOf("/")+1);
+					fileUrl.substring(fileUrl.lastIndexOf("/") + 1), "UTF-8");
 			
-			String dirName = params.has("dirName") ? params.getString("dirName") : null;
+			final String dirName = params.has("dirName") ? params.getString("dirName") : null;
 					
-			Boolean overwrite = params.has("overwrite") ? params.getBoolean("overwrite") : false;
+			final Boolean overwrite = params.has("overwrite") ? params.getBoolean("overwrite") : false;
 			
-			return this.downloadUrl(fileUrl, dirName, fileName, overwrite, callbackId);
 			
-		} catch (JSONException e) {
+			cordova.getThreadPool().execute(new Runnable() {
 
-			e.printStackTrace();
-			return new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage());
+				@Override
+				public void run() {
+					try {
+						PluginResult res = downloadUrl(fileUrl, dirName, fileName, overwrite, callbackContext);
+						callbackContext.sendPluginResult(res);						
+					} catch (Exception e) {
+						e.printStackTrace();
+						callbackContext.error(e.getMessage());			
+					}
+				}
+			});
 			
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			return new PluginResult(PluginResult.Status.ERROR, e.getMessage());
+			callbackContext.error(e.getMessage());			
 		}
-	
+		return true;		
 	}
 	
 	private File getTempDir() {
@@ -68,7 +78,7 @@ public class Downloader extends Plugin {
 	}
 
 	@SuppressLint({ "WorldReadableFiles", "WorldWriteableFiles" })
-	private PluginResult downloadUrl(String fileUrl, String dirName, String fileName, Boolean overwrite, String callbackId) throws InterruptedException, JSONException {	
+	private PluginResult downloadUrl(String fileUrl, String dirName, String fileName, Boolean overwrite, CallbackContext callbackContext) throws InterruptedException, JSONException {	
 		try {
 			final File targetDir;
 			if (dirName != null) {
@@ -101,6 +111,8 @@ public class Downloader extends Plugin {
 			URL url = new URL(fileUrl);
 			HttpURLConnection ucon = (HttpURLConnection) url.openConnection();
 			ucon.setRequestMethod("GET");
+			ucon.setConnectTimeout(30000);
+			ucon.setReadTimeout(60000);
 			ucon.connect();
 
 			Log.d("PhoneGapLog", "Download start");
@@ -113,6 +125,7 @@ public class Downloader extends Plugin {
 			    fileSize = ucon.getContentLength();
 			
 			// internal app file storage can be used by default or supplied by user, so check this ensure proper file rights
+			@SuppressWarnings({ "resource", "deprecation" })
 			FileOutputStream fos = 
 				cordova.getActivity().getFilesDir().equals(targetDir) ?
 					cordova.getActivity().openFileOutput(fileName, Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE) :
@@ -125,9 +138,9 @@ public class Downloader extends Plugin {
 					totalReaded += readed;
 					
 					int newProgress = (int) (totalReaded*100/fileSize);				
-					if (newProgress != progress)
-					 progress = informProgress(fileSize, newProgress, dirName, fileName, callbackId);
-	
+					if (newProgress != progress) {
+					 progress = informProgress(fileSize, newProgress, dirName, fileName, callbackContext);
+					}
 				}
 			} finally {
 				is.close();
@@ -153,10 +166,9 @@ public class Downloader extends Plugin {
 			Log.d("PhoneGapLog", "Error: " + e);
 			return new PluginResult(PluginResult.Status.ERROR, e.getMessage());
 		}
-
 	}
 	
-	private int informProgress(int fileSize, int progress, String dirName, String fileName, String callbackId) throws InterruptedException, JSONException {
+	private int informProgress(int fileSize, int progress, String dirName, String fileName, CallbackContext callbackContext) throws InterruptedException, JSONException {
 		
 		JSONObject obj = new JSONObject();
 		obj.put("status", 0);
@@ -167,12 +179,11 @@ public class Downloader extends Plugin {
 		
 		PluginResult res = new PluginResult(PluginResult.Status.OK, obj);
 		res.setKeepCallback(true);
-		success(res, callbackId);
+		callbackContext.sendPluginResult(res);
 		
 		//Give a chance for the progress to be sent to javascript
 		Thread.sleep(100);
 		
 		return progress; 
 	}
-
 }
