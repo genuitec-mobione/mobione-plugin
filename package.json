@@ -1,0 +1,14 @@
+{
+  "name": "mobione-plugin",
+  "version": "0.2.8",
+  "description": "Support plugin for MobiOne native features",
+  "cordova": {
+    "id": "mobione-plugin",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "author": "info@genuitec.com",
+  "license": "MIT License"
+}
