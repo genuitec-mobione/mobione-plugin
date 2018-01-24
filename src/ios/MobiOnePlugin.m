@@ -14,11 +14,19 @@
     return self;
 }
 
+- (void) useNativeDialPhone:(CDVInvokedUrlCommand*)command {
+     CDVPluginResult* pluginResult =
+        [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"true"];   
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+/*
 - (void) useNativeDialPhone:(NSMutableArray *)arguments withDict:(NSMutableDictionary *) options {
     self.callbackID = [arguments pop];
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"true"];
     [self writeJavascript: [pluginResult toSuccessCallbackString:self.callbackID]];
 }
+*/
 
 - (void) dialPhone:(NSMutableArray *)arguments withDict:(NSMutableDictionary *)options {
     NSString* ph = [options valueForKey:@"number"];
@@ -37,12 +45,19 @@
 }
 
 
+- (void) useNativeVideoPlayer:(CDVInvokedUrlCommand*)command {
+    CDVPluginResult* pluginResult =
+        [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"true"];   
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+/*
 - (void) useNativeVideoPlayer:(NSMutableArray *)arguments withDict:(NSMutableDictionary *) options {
     self.callbackID = [arguments pop];
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"true"];
     [self writeJavascript: [pluginResult toSuccessCallbackString:self.callbackID]];
 }
-
+*/
 
 - (void) playVideo:(NSMutableArray *)arguments withDict:(NSMutableDictionary *) options {    
     NSLog(@"playVideo called");

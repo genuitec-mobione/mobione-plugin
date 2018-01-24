@@ -12,13 +12,13 @@
 @property (nonatomic, copy) NSString* callbackID;
 
 
-- (void) useNativeDialPhone:(NSMutableArray *)arguments withDict:(NSMutableDictionary *) options;
+- (void) useNativeDialPhone:(CDVInvokedUrlCommand*)command;
 
 
 - (void) dialPhone:(NSMutableArray *)arguments withDict:(NSMutableDictionary *) options;
 
 
-- (void) useNativeVideoPlayer:(NSMutableArray *)arguments withDict:(NSMutableDictionary *) options;
+- (void) useNativeVideoPlayer:(CDVInvokedUrlCommand*)command;
 
 
 - (void) playVideo:(NSMutableArray *)arguments withDict:(NSMutableDictionary *) options;
